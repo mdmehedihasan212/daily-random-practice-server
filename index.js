@@ -22,16 +22,23 @@ async function run() {
         const productCollection = client.db('productsCollection').collection('instruments')
 
         app.get('/products', async (req, res) => {
+            console.log('query', req.query);
+            const page = parseInt(req.query.page);
+            const size = parseInt(req.query.size);
             const query = {};
             const cursor = productCollection.find(query);
-            const products = await cursor.toArray();
+            let products;
+            if (page || size) {
+                products = await cursor.skip(page * size).limit(size).toArray();
+            }
+            else {
+                products = await cursor.toArray();
+            }
             res.send(products);
         })
 
         app.get('/productCount', async (req, res) => {
-            const query = {};
-            const cursor = productCollection.find(query);
-            const products = await cursor.count();
+            const products = await productCollection.estimatedDocumentCount();
             res.send({ products });
         })
 
