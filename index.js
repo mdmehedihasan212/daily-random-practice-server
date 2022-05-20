@@ -28,6 +28,13 @@ async function run() {
             res.send(products);
         })
 
+        app.get('/productCount', async (req, res) => {
+            const query = {};
+            const cursor = productCollection.find(query);
+            const products = await cursor.count();
+            res.send({ products });
+        })
+
     }
     finally {
         // await client.close();
